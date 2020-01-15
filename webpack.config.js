@@ -1,4 +1,5 @@
 var path = require('path')
+var webpack = require('webpack')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
@@ -12,9 +13,12 @@ module.exports = {
 		new CleanWebpackPlugin(),
 		new HtmlWebpackPlugin({
 			title: 'test'
-		})
+		}),
+		new webpack.NamedModulesPlugin(),
+		new webpack.HotModuleReplacementPlugin()
 	],
 	devServer: {
-		contentBase: './dist'
+		contentBase: './dist',
+		hot: true
 	}
 }
