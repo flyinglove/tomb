@@ -32,7 +32,7 @@ class MyPromise {
 		this.reason = reason
 		while(this.failCallbackArr.length) this.failCallbackArr.shift()()
 	}
-	then = (successCallback, failCallback) => {
+	then(successCallback, failCallback){
 		successCallback = successCallback ? successCallback : value => value
 		failCallback = failCallback ? failCallback : reason => {throw reason}
 		let promise2 = new MyPromise((resolve,  reject) => {
@@ -79,6 +79,44 @@ class MyPromise {
 			}
 		})
 		return promise2
+	}
+	static all(arr) {
+		let result = []
+		let index = 0
+		return new MyPromise((resolve,reject) => {
+			function addData(index, data) {
+				result[index] =  data
+				index++
+				if (index === arr.length) {
+					resolve(result)
+				}
+			}
+			for (let i = 0; i < arr.length;  i++) {
+				let current = arr[i]
+				if (current instanceof MyPromise) {
+					x.then((value) => addData(i, value), reject)
+				} else  {
+					addData(i, current)
+				}
+			}
+		})
+	}
+	static resolve(value) {
+		if (value instanceof MyPromise) {
+			return value
+		} else  {
+			return new MyPromise((resolve) => resolve(value))
+		}
+	}
+	finally(callback) {
+		return this.then((value) => {
+			return MyPromise.resolve(callback()).then(() => value)
+		}, (reason) => {
+			return MyPromise.resolve(callback()).then(() => {throw reason})
+		})
+	}
+	catch(failCallback) {
+		return this.then(undefined, failCallback)
 	}
 }
 
